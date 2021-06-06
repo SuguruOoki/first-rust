@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  backend:
+    build:
+      context: .
+      target: 'develop'
+    ports:
+      - "8088:8088"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/app/target
+    command: bash -c "diesel setup && cargo watch -x run"
+    tty: true
+  db:
+    build:
+      context: .
+      target: 'db'
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdate:/var/lib/postgresql/data
+    env_file:
+      - .env
+    restart: always
+
+volumes:
+  cargo-cache:
+  target-cache:
+  pgdate:
